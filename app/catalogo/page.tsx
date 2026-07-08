@@ -80,6 +80,13 @@ export default function CatalogoPage() {
         <h1 className="text-xl font-bold">Catálogo</h1>
         <div className="flex items-center gap-2">
           <Link
+            href="/ajuda"
+            className="rounded-lg border border-borda px-2.5 py-1.5 text-sm text-muted hover:text-texto"
+            title="Como usar"
+          >
+            ❓
+          </Link>
+          <Link
             href="/cidades"
             className="rounded-lg border border-borda px-2.5 py-1.5 text-sm text-muted hover:text-texto"
             title="Cidades (combustível)"
