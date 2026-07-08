@@ -6,6 +6,9 @@ function brl(n: number) {
   return n.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
+// abaixo disso a mediana é "chute com pouca gente" — preço pouco confiável
+const AMOSTRAS_CONFIAVEL = 8;
+
 export default function PecaCard({
   peca,
   onCalibrar,
@@ -45,13 +48,21 @@ export default function PecaCard({
       </div>
 
       {pb ? (
-        <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-lg font-bold">R$ {brl(pb.preco_mediana)}</span>
-          <span className="text-xs text-muted">
-            ({brl(pb.preco_min)}–{brl(pb.preco_max)}) · {pb.amostras} amostras
-            {peca.total_calibracoes > 1 ? ` · ${peca.total_calibracoes} calib.` : ''}
-          </span>
-        </div>
+        <>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-lg font-bold">R$ {brl(pb.preco_mediana)}</span>
+            <span className="text-xs text-muted">
+              ({brl(pb.preco_min)}–{brl(pb.preco_max)}) · {pb.amostras} amostras
+              {peca.total_calibracoes > 1 ? ` · ${peca.total_calibracoes} calib.` : ''}
+            </span>
+          </div>
+          {pb.amostras < AMOSTRAS_CONFIAVEL && (
+            <div className="mt-1.5 rounded-md border border-amarelo/40 bg-amarelo/10 px-2 py-1 text-xs text-amarelo">
+              ⚠️ Base fraca — só {pb.amostras} anúncio{pb.amostras === 1 ? '' : 's'}. Calibre mais vezes
+              pra firmar o preço (ideal ≥ {AMOSTRAS_CONFIAVEL}).
+            </div>
+          )}
+        </>
       ) : (
         <div className="mt-2 text-sm text-muted">
           Sem preço — <span className="text-amarelo">calibre pra ativar no veredito.</span>

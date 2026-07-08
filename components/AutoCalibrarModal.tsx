@@ -15,7 +15,8 @@ interface Calibrada {
   peca: string;
   preco_mediana: number;
   preco_anterior: number | null;
-  amostras: number;
+  amostras: number; // total acumulado (base da confiança)
+  amostras_print?: number; // quantos entraram neste print
   outliers_descartados: number;
 }
 interface Ignorada {
@@ -108,19 +109,35 @@ export default function AutoCalibrarModal({
               )}
             </p>
 
-            {resultado.calibradas.map((c) => (
-              <div key={c.peca} className="rounded-xl border border-verde/40 bg-verde/10 p-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold">✓ {c.peca}</span>
-                  <span className="font-bold text-verde">R$ {c.preco_mediana}</span>
+            {resultado.calibradas.map((c) => {
+              const fraca = c.amostras < 8;
+              return (
+                <div
+                  key={c.peca}
+                  className={`rounded-xl border p-3 ${
+                    fraca ? 'border-amarelo/40 bg-amarelo/10' : 'border-verde/40 bg-verde/10'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">{fraca ? '⚠️' : '✓'} {c.peca}</span>
+                    <span className={`font-bold ${fraca ? 'text-amarelo' : 'text-verde'}`}>
+                      R$ {c.preco_mediana}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-muted">
+                    {c.amostras} amostra{c.amostras === 1 ? '' : 's'} no total
+                    {c.amostras_print != null && <> (+{c.amostras_print} agora)</>}
+                    {c.outliers_descartados > 0 && <> · {c.outliers_descartados} outlier fora</>}
+                    {c.preco_anterior != null && <> · antes: R$ {c.preco_anterior}</>}
+                  </p>
+                  {fraca && (
+                    <p className="mt-1 text-xs text-amarelo">
+                      Poucas amostras — preço provisório. Calibre de novo pra firmar (ideal ≥ 8).
+                    </p>
+                  )}
                 </div>
-                <p className="mt-0.5 text-xs text-muted">
-                  {c.amostras} anúncios
-                  {c.outliers_descartados > 0 && <> · {c.outliers_descartados} outlier fora</>}
-                  {c.preco_anterior != null && <> · antes: R$ {c.preco_anterior}</>}
-                </p>
-              </div>
-            ))}
+              );
+            })}
 
             {resultado.ignoradas.map((i, idx) => (
               <div key={idx} className="rounded-xl border border-borda bg-surface2 p-2.5">
