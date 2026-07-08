@@ -30,6 +30,8 @@ export default function TriagemPage() {
   const [link, setLink] = useState('');
   const [telefone, setTelefone] = useState('');
   const [titulo, setTitulo] = useState('');
+  const [precoPedido, setPrecoPedido] = useState(''); // editável: vendedor baixou? atualiza e recalcula
+  const [precoPix, setPrecoPix] = useState('');
   const [cidades, setCidades] = useState<Cidade[]>([]);
   const [cidadeId, setCidadeId] = useState<string>('');
   const [catalogo, setCatalogo] = useState<Peca[]>([]);
@@ -70,6 +72,8 @@ export default function TriagemPage() {
       if (!raw) return setErro('Essa prospecção não tem dados pra editar.');
       setEditingId(id);
       setTitulo(full.titulo || raw.titulo || '');
+      setPrecoPedido(raw.preco_pedido != null ? String(raw.preco_pedido) : '');
+      setPrecoPix(raw.preco_pix != null ? String(raw.preco_pix) : '');
       setLink(full.link_origem || '');
       setTelefone(full.telefone || '');
       if (full.cidade_id) setCidadeId(String(full.cidade_id));
@@ -116,7 +120,10 @@ export default function TriagemPage() {
       if (pm !== '' && pm != null && Number(pm) > 0) o.preco_manual = Number(pm);
       return o;
     });
-    return { ...(resp?.raw_extracao || {}), titulo: titulo || null, pecas };
+    // preço editado na tela vence o do anúncio (vendedor baixou -> recalcula)
+    const preco_pedido = precoPedido !== '' && Number(precoPedido) > 0 ? Number(precoPedido) : null;
+    const preco_pix = precoPix !== '' && Number(precoPix) > 0 ? Number(precoPix) : null;
+    return { ...(resp?.raw_extracao || {}), titulo: titulo || null, pecas, preco_pedido, preco_pix };
   }
 
   // monta o esqueleto completo do PC: detectadas (preenchidas) + as que faltam
@@ -176,6 +183,8 @@ export default function TriagemPage() {
       setResp(r);
       setAnalise(r.analise);
       setTitulo((r.raw_extracao && r.raw_extracao.titulo) || '');
+      setPrecoPedido(r.raw_extracao?.preco_pedido != null ? String(r.raw_extracao.preco_pedido) : '');
+      setPrecoPix(r.raw_extracao?.preco_pix != null ? String(r.raw_extracao.preco_pix) : '');
       if (r.raw_extracao && r.raw_extracao.telefone) setTelefone(r.raw_extracao.telefone);
       setPecasEdit(pecasDoParser(r.raw_extracao));
       setModsOff([]);
@@ -417,6 +426,44 @@ export default function TriagemPage() {
             placeholder="ex.: PC Gamer RTX 3060 Ti + Ryzen 5 5600"
             className="mt-1 w-full rounded-lg border border-borda bg-surface2 px-2 py-2 text-sm text-texto"
           />
+        </div>
+      )}
+
+      {/* preço do anúncio (editável: vendedor baixou? atualiza aqui e recalcula) */}
+      {analise && (
+        <div className="rounded-2xl border border-borda bg-surface p-3">
+          <div className="flex items-end gap-2">
+            <label className="flex-1 text-xs text-muted">
+              💰 Preço pedido (R$)
+              <input
+                inputMode="numeric"
+                value={precoPedido}
+                onChange={(e) => setPrecoPedido(e.target.value)}
+                placeholder="ex.: 2500"
+                className="mt-1 w-full rounded-lg border border-borda bg-surface2 px-2 py-2 text-sm text-texto"
+              />
+            </label>
+            <label className="flex-1 text-xs text-muted">
+              Pix (R$, opcional)
+              <input
+                inputMode="numeric"
+                value={precoPix}
+                onChange={(e) => setPrecoPix(e.target.value)}
+                placeholder="se for menor"
+                className="mt-1 w-full rounded-lg border border-borda bg-surface2 px-2 py-2 text-sm text-texto"
+              />
+            </label>
+            <button
+              onClick={() => reavaliar({})}
+              disabled={recalculando}
+              className="shrink-0 rounded-lg border border-roxo bg-roxo/20 px-3 py-2 text-sm font-semibold text-texto disabled:opacity-50"
+            >
+              {recalculando ? '…' : '↻ Recalcular'}
+            </button>
+          </div>
+          <p className="mt-1.5 text-xs text-muted">
+            Vendedor baixou o preço? Atualize aqui e recalcule — o veredito e a oferta refazem na hora.
+          </p>
         </div>
       )}
 
