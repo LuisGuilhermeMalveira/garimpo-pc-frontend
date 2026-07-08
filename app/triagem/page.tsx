@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import {
   BASE_CATEGORIAS,
@@ -55,6 +55,30 @@ export default function TriagemPage() {
   useEffect(() => {
     api.get<Cidade[]>('/cidades').then(setCidades).catch(() => {});
     api.get<Peca[]>('/pecas').then(setCatalogo).catch(() => {});
+  }, []);
+
+  // calibrou uma peça em OUTRA aba (extensão 📊 na OLX)? Ao voltar pra cá,
+  // recarrega o banco e recalcula o veredito SEM perder as edições da triagem.
+  const aoVoltarRef = useRef<() => void>(() => {});
+  aoVoltarRef.current = () => {
+    api.get<Peca[]>('/pecas').then(setCatalogo).catch(() => {});
+    if (resp && !analisando && !recalculando && !salvando) reavaliar({});
+  };
+  useEffect(() => {
+    let ultimo = 0;
+    const aoVoltar = () => {
+      if (document.hidden) return;
+      const agora = Date.now();
+      if (agora - ultimo < 8000) return; // no máx. 1x a cada 8s
+      ultimo = agora;
+      aoVoltarRef.current();
+    };
+    window.addEventListener('focus', aoVoltar);
+    document.addEventListener('visibilitychange', aoVoltar);
+    return () => {
+      window.removeEventListener('focus', aoVoltar);
+      document.removeEventListener('visibilitychange', aoVoltar);
+    };
   }, []);
 
   // abre uma prospecção salva pra editar (?edit=ID vindo do Histórico)
