@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #0b0f14;
+  color: #e6edf3;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* esconde scrollbar feia mantendo o scroll (mobile-first) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #27313d transparent;
+}
+
+/* área segura pra barra inferior fixa não cobrir conteúdo */
+.pb-nav {
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+}
+
+/* barra de progresso indeterminada (faixa que corre) */
+@keyframes barra-corre {
+  0% {
+    left: -45%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+.barra-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 45%;
+  border-radius: 9999px;
+  animation: barra-corre 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
