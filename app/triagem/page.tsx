@@ -50,6 +50,7 @@ export default function TriagemPage() {
   const [salvando, setSalvando] = useState(false);
   const [salvo, setSalvo] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [capturaId, setCapturaId] = useState<number | null>(null); // print vindo da extensão
   const [calibrarPeca, setCalibrarPeca] = useState<Peca | null>(null);
 
   useEffect(() => {
@@ -82,11 +83,28 @@ export default function TriagemPage() {
   }, []);
 
   // abre uma prospecção salva pra editar (?edit=ID vindo do Histórico)
+  // ou um print capturado pela extensão (?captura=ID — só carrega; Analisar é manual)
   useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get('edit');
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('edit');
     if (id) carregarParaEditar(Number(id));
+    const cap = params.get('captura');
+    if (cap) carregarCaptura(Number(cap));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function carregarCaptura(id: number) {
+    setErro(null);
+    try {
+      const c = await api.get<any>(`/capturas/${id}`);
+      setCapturaId(id);
+      if (c.link) setLink(c.link);
+      if (c.titulo) setTitulo(c.titulo);
+      setOrigem(c.origem === 'facebook' ? 'facebook' : 'olx');
+    } catch (e: any) {
+      setErro(e.message || 'Captura não encontrada — garimpe a página de novo.');
+    }
+  }
 
   async function carregarParaEditar(id: number) {
     setErro(null);
@@ -182,12 +200,21 @@ export default function TriagemPage() {
     setSalvo(false);
     setSemRemoviveis(false);
     setEditingId(null); // analisar um anúncio novo cria nova prospecção
-    if (modo === 'print' && arquivos.length === 0) return setErro('Solte o(s) print(s) do anúncio.');
-    if (modo === 'texto' && !texto.trim()) return setErro('Cole o texto do anúncio.');
+    if (!capturaId && modo === 'print' && arquivos.length === 0) return setErro('Solte o(s) print(s) do anúncio.');
+    if (!capturaId && modo === 'texto' && !texto.trim()) return setErro('Cole o texto do anúncio.');
     setAnalisando(true);
     try {
       let r: RespostaAnalisar;
-      if (modo === 'print') {
+      if (capturaId) {
+        // print da extensão já está no servidor — só manda ler
+        r = await api.post('/prospeccoes/analisar', {
+          captura_id: capturaId,
+          origem,
+          provider,
+          link: link.trim() || undefined,
+          cidade_id: cidadeId ? Number(cidadeId) : undefined,
+        });
+      } else if (modo === 'print') {
         const form = new FormData();
         arquivos.forEach((f) => form.append('imagem', f));
         form.append('origem', origem);
@@ -321,6 +348,13 @@ export default function TriagemPage() {
       {editingId && (
         <p className="rounded-lg border border-roxo/40 bg-roxo/10 p-2 text-sm text-texto">
           ✏️ Editando uma prospecção salva — ajuste as peças e toque em <b>Salvar alterações</b>.
+        </p>
+      )}
+
+      {capturaId && !analise && (
+        <p className="rounded-lg border border-verde/40 bg-verde/10 p-2 text-sm text-texto">
+          ⛏️ Print da extensão carregado{titulo ? <> — <b>{titulo}</b></> : null}. Toque em{' '}
+          <b>Analisar</b> pra IA ler.
         </p>
       )}
 

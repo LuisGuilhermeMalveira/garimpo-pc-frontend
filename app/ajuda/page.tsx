@@ -130,9 +130,9 @@ export default function AjudaPage() {
         <h3 className="pt-2 font-semibold text-texto">Uso — dois botões:</h3>
         <Passo n={1}>
           <strong className="text-texto">🔍 Garimpar</strong> — na página de um{' '}
-          <strong className="text-texto">anúncio</strong>: captura, analisa, salva no histórico e
-          abre a triagem (10–30s). Garimpar o mesmo link de novo <em>atualiza</em> o PC (não
-          duplica).
+          <strong className="text-texto">anúncio</strong>: captura a página inteira e abre a
+          Triagem com o print carregado. <em>Você</em> toca em Analisar, revisa e salva — nada é
+          salvo sem você mandar. Salvar com o mesmo link <em>atualiza</em> o PC (não duplica).
         </Passo>
         <Passo n={2}>
           <strong className="text-texto">📊 Calibrar preços</strong> — na página de uma{' '}
