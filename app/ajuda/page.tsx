@@ -127,13 +127,18 @@ export default function AjudaPage() {
           preenchidas.)
         </Passo>
 
-        <h3 className="pt-2 font-semibold text-texto">Uso:</h3>
-        <Passo n={1}>Abra o anúncio na OLX/Facebook no Chrome.</Passo>
-        <Passo n={2}>
-          Clique no ⛏️ → <strong className="text-texto">🔍 Garimpar esta página</strong>.
+        <h3 className="pt-2 font-semibold text-texto">Uso — dois botões:</h3>
+        <Passo n={1}>
+          <strong className="text-texto">🔍 Garimpar</strong> — na página de um{' '}
+          <strong className="text-texto">anúncio</strong>: captura, analisa, salva no histórico e
+          abre a triagem (10–30s). Garimpar o mesmo link de novo <em>atualiza</em> o PC (não
+          duplica).
         </Passo>
-        <Passo n={3}>
-          Aguarde 10–30s (a IA está lendo) — o app abre sozinho com o PC carregado.
+        <Passo n={2}>
+          <strong className="text-texto">📊 Calibrar preços</strong> — na página de uma{' '}
+          <strong className="text-texto">busca</strong> (ex.: &quot;gtx 1660&quot;): a IA identifica
+          cada peça avulsa, separa variantes (1660 ≠ Super ≠ Ti), descarta defeito/PC montado e
+          grava a mediana de cada uma no banco. Um print calibra várias peças de uma vez.
         </Passo>
         <p className="pt-1 text-xs">
           ℹ️ Durante a captura aparece a barrinha &quot;garimpo-pc começou a depurar este

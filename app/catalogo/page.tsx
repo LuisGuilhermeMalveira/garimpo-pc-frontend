@@ -7,6 +7,7 @@ import { CATEGORIAS, type Categoria, type Peca, type NivelFrescor } from '@/lib/
 import PecaCard from '@/components/PecaCard';
 import CalibrarModal from '@/components/CalibrarModal';
 import NovaPecaModal from '@/components/NovaPecaModal';
+import AutoCalibrarModal from '@/components/AutoCalibrarModal';
 
 const FRESCORES: { v: NivelFrescor | 'todos'; label: string }[] = [
   { v: 'todos', label: 'Todos' },
@@ -25,6 +26,7 @@ export default function CatalogoPage() {
   const [fFrescor, setFFrescor] = useState<NivelFrescor | 'todos'>('todos');
   const [calibrar, setCalibrar] = useState<Peca | null>(null);
   const [novaPeca, setNovaPeca] = useState(false);
+  const [autoCalibrar, setAutoCalibrar] = useState(false);
 
   const carregar = useCallback(async () => {
     setCarregando(true);
@@ -100,6 +102,13 @@ export default function CatalogoPage() {
           >
             ⚙️
           </Link>
+          <button
+            onClick={() => setAutoCalibrar(true)}
+            className="rounded-lg border border-verde/50 px-2.5 py-1.5 text-sm text-verde"
+            title="Calibração automática (print de busca)"
+          >
+            📊
+          </button>
           <button
             onClick={() => setNovaPeca(true)}
             className="rounded-lg bg-roxo px-3 py-1.5 text-sm font-medium text-white"
@@ -177,6 +186,9 @@ export default function CatalogoPage() {
             setCalibrar(p); // já abre a calibração da peça nova
           }}
         />
+      )}
+      {autoCalibrar && (
+        <AutoCalibrarModal onClose={() => setAutoCalibrar(false)} onSaved={carregar} />
       )}
     </div>
   );
