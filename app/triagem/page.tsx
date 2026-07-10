@@ -352,10 +352,22 @@ export default function TriagemPage() {
       )}
 
       {capturaId && !analise && (
-        <p className="rounded-lg border border-verde/40 bg-verde/10 p-2 text-sm text-texto">
-          ⛏️ Print da extensão carregado{titulo ? <> — <b>{titulo}</b></> : null}. Toque em{' '}
-          <b>Analisar</b> pra IA ler.
-        </p>
+        <div className="rounded-lg border border-verde/40 bg-verde/10 p-2 text-sm text-texto">
+          <p>
+            ⛏️ Print da extensão carregado{titulo ? <> — <b>{titulo}</b></> : null}. Confira a
+            miniatura e toque em <b>Analisar</b>.
+          </p>
+          {/* miniatura de conferência: se veio cortado/branco, recaptura antes de gastar IA */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={api.urlComToken(`/capturas/${capturaId}/imagem`)}
+            alt="Print capturado (topo)"
+            className="mt-2 max-h-72 w-full rounded-lg border border-borda object-cover object-top"
+          />
+          <p className="mt-1 text-xs text-muted">
+            (mostrando o topo do print — a IA lê ele inteiro)
+          </p>
+        </div>
       )}
 
       {/* input */}

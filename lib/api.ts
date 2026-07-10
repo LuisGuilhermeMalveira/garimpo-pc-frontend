@@ -28,6 +28,9 @@ async function tratar(res: Response) {
 export const api = {
   base: BASE,
   temToken: () => TOKEN.length > 0,
+  // URL direta (ex.: <img src>) — auth vai por query, que o backend aceita
+  urlComToken: (path: string) =>
+    `${BASE}${path}${path.includes('?') ? '&' : '?'}token=${encodeURIComponent(TOKEN)}`,
 
   async get<T = any>(path: string): Promise<T> {
     const res = await fetch(`${BASE}${path}`, { headers: headers(), cache: 'no-store' });
