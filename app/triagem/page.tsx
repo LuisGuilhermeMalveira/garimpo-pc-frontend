@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '@/lib/api';
+import { numBr } from '@/lib/num';
 import {
   BASE_CATEGORIAS,
   ORDEM_CATEGORIAS,
@@ -142,7 +143,8 @@ export default function TriagemPage() {
   // linha "preenchida"? (tem modelo OU preço) — vazias do esqueleto são ignoradas
   function linhaPreenchida(p: PecaEdit) {
     const temModelo = !!(p.modelo && p.modelo.trim());
-    const temPreco = p.preco_manual !== '' && p.preco_manual != null && Number(p.preco_manual) > 0;
+    const pmv = numBr(p.preco_manual as any);
+    const temPreco = pmv != null && pmv > 0;
     return temModelo || temPreco;
   }
 
@@ -158,13 +160,15 @@ export default function TriagemPage() {
         capacidade: p.capacidade ?? null,
         removivel: !!p.removivel,
       };
-      const pm = p.preco_manual;
-      if (pm !== '' && pm != null && Number(pm) > 0) o.preco_manual = Number(pm);
+      const pm = numBr(p.preco_manual as any);
+      if (pm != null && pm > 0) o.preco_manual = pm;
       return o;
     });
     // preço editado na tela vence o do anúncio (vendedor baixou -> recalcula)
-    const preco_pedido = precoPedido !== '' && Number(precoPedido) > 0 ? Number(precoPedido) : null;
-    const preco_pix = precoPix !== '' && Number(precoPix) > 0 ? Number(precoPix) : null;
+    const pp = numBr(precoPedido);
+    const px = numBr(precoPix);
+    const preco_pedido = pp != null && pp > 0 ? pp : null;
+    const preco_pix = px != null && px > 0 ? px : null;
     return { ...(resp?.raw_extracao || {}), titulo: titulo || null, pecas, preco_pedido, preco_pix };
   }
 

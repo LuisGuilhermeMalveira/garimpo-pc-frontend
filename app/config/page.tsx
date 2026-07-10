@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { numBr } from '@/lib/num';
 import { CATEGORIAS, type Categoria, type Config } from '@/lib/types';
 
 // ordem dos pisos na tela (gpu fica de fora: sem piso)
@@ -90,18 +91,29 @@ export default function ConfigPage() {
   async function salvar() {
     setErro(null);
     setSalvo(false);
+
+    // aceita vírgula; vazio/inválido é erro na tela — nunca 0 silencioso
+    const vReal = numBr(realizacao);
+    const vMargem = numBr(margem);
+    const vPiso = numBr(piso);
+    const vCustoKm = numBr(custoKm);
+    if (vReal == null) return setErro('Fator de realização inválido — digite um número (ex.: 90).');
+    if (vMargem == null) return setErro('Margem de risco inválida — digite um número (ex.: 5).');
+    if (vPiso == null) return setErro('Piso de lucro inválido — digite um número (ex.: 250).');
+    if (vCustoKm == null || vCustoKm <= 0)
+      return setErro('Custo por km inválido — digite um número maior que zero (ex.: 0,42).');
+
     setSalvando(true);
     try {
       const pisosObj: Record<string, number | null> = {};
       for (const cat of CATS_PISO) {
-        const v = pisos[cat];
-        pisosObj[cat] = v === '' || v == null ? null : Number(v);
+        pisosObj[cat] = numBr(pisos[cat]);
       }
       await api.patch<Config>('/config', {
-        fator_realizacao: Number(realizacao) / 100,
-        margem_risco_pct: Number(margem) / 100,
-        piso_lucro: Number(piso),
-        custo_km: Number(custoKm),
+        fator_realizacao: vReal / 100,
+        margem_risco_pct: vMargem / 100,
+        piso_lucro: vPiso,
+        custo_km: vCustoKm,
         pisos: pisosObj,
       });
       setSalvo(true);

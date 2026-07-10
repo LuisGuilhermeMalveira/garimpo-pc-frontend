@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { numBr } from '@/lib/num';
 import type { Cidade, Config } from '@/lib/types';
 
 function brl(n: number) {
@@ -43,11 +44,13 @@ export default function CidadesPage() {
   }, [carregar]);
 
   // prévia do combustível enquanto digita o km (se não digitou o custo na mão)
-  const previa = km && custo === '' ? Math.round(Number(km) * custoKm) : null;
+  const kmNum = numBr(km);
+  const previa = kmNum != null && custo === '' ? Math.round(kmNum * custoKm) : null;
 
   async function adicionar() {
-    if (!nome.trim() || km === '') {
-      setErro('Preencha o nome e o km (ida + volta).');
+    const kmV = numBr(km);
+    if (!nome.trim() || kmV == null) {
+      setErro('Preencha o nome e o km (ida + volta) com um número.');
       return;
     }
     setErro(null);
@@ -55,8 +58,8 @@ export default function CidadesPage() {
     try {
       await api.post('/cidades', {
         nome: nome.trim(),
-        km_ida_volta: Number(km),
-        custo_aquisicao: custo === '' ? undefined : Number(custo),
+        km_ida_volta: kmV,
+        custo_aquisicao: numBr(custo) ?? undefined,
       });
       setNome('');
       setKm('');
@@ -72,9 +75,11 @@ export default function CidadesPage() {
   async function editarKm(c: Cidade) {
     const novo = window.prompt(`Km ida+volta de ${c.nome}:`, String(c.km_ida_volta));
     if (novo === null) return;
+    const v = numBr(novo);
+    if (v == null) return setErro(`"${novo}" não é um número válido.`);
     try {
       // manda só o km -> backend recalcula o combustível pelo custo_km
-      await api.patch(`/cidades/${c.id}`, { km_ida_volta: Number(novo) });
+      await api.patch(`/cidades/${c.id}`, { km_ida_volta: v });
       carregar();
     } catch (e: any) {
       setErro(e.message || 'Falha ao salvar.');
@@ -84,8 +89,10 @@ export default function CidadesPage() {
   async function editarCusto(c: Cidade) {
     const novo = window.prompt(`Combustível de ${c.nome} (R$, ida+volta):`, String(c.custo_aquisicao));
     if (novo === null) return;
+    const v = numBr(novo);
+    if (v == null) return setErro(`"${novo}" não é um número válido.`);
     try {
-      await api.patch(`/cidades/${c.id}`, { custo_aquisicao: Number(novo) });
+      await api.patch(`/cidades/${c.id}`, { custo_aquisicao: v });
       carregar();
     } catch (e: any) {
       setErro(e.message || 'Falha ao salvar.');
