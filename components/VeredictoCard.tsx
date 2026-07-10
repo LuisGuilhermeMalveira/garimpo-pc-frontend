@@ -71,6 +71,8 @@ export default function VeredictoCard({ analise: a }: { analise: Analise }) {
               className={`rounded-lg px-2 py-1.5 text-xs ${
                 al.nivel === 'vermelho'
                   ? 'bg-vermelho/10 text-vermelho'
+                  : al.nivel === 'info'
+                  ? 'bg-azul/10 text-azul'
                   : 'bg-amarelo/10 text-amarelo'
               }`}
             >
@@ -158,7 +160,7 @@ export default function VeredictoCard({ analise: a }: { analise: Analise }) {
             valor={`− R$ ${brl(a.preco_pix ?? a.preco_pedido)}`}
           />
           <Linha
-            label={a.tem_entrega ? 'Entrega (frete)' : 'Combustível'}
+            label={a.cidade ? `Combustível (${a.cidade.nome})` : 'Combustível'}
             valor={`− R$ ${brl(a.custo_aquisicao)}`}
           />
           {a.custo_recuperacao > 0 && (

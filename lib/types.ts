@@ -111,7 +111,7 @@ export interface ModAplicado {
 }
 
 export interface Alerta {
-  nivel: 'amarelo' | 'vermelho';
+  nivel: 'amarelo' | 'vermelho' | 'info';
   msg: string;
 }
 
