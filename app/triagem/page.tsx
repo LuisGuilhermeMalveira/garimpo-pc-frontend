@@ -517,16 +517,6 @@ export default function TriagemPage() {
                 className="mt-1 w-full rounded-lg border border-borda bg-surface2 px-2 py-2 text-sm text-texto"
               />
             </label>
-            <label className="flex-1 text-xs text-muted">
-              Pix (R$, opcional)
-              <input
-                inputMode="numeric"
-                value={precoPix}
-                onChange={(e) => setPrecoPix(e.target.value)}
-                placeholder="se for menor"
-                className="mt-1 w-full rounded-lg border border-borda bg-surface2 px-2 py-2 text-sm text-texto"
-              />
-            </label>
             <button
               onClick={() => reavaliar({})}
               disabled={recalculando}

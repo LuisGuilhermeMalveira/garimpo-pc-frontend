@@ -89,7 +89,10 @@ export default function VeredictoCard({ analise: a }: { analise: Analise }) {
             <div key={i} className="flex items-baseline justify-between gap-2">
               <span className="min-w-0 truncate">
                 {it.modelo_extraido}
-                {it.quantidade > 1 ? ` ×${it.quantidade}` : ''}
+                {/* nome de RAM decomposta já vem com "×N" — não duplica */}
+                {it.quantidade > 1 && !String(it.modelo_extraido).includes('×')
+                  ? ` ×${it.quantidade}`
+                  : ''}
                 {it.removivel && <span className="text-muted"> ⊖</span>}
                 {it.origem === 'estimado' && (
                   <span className="text-amarelo">
@@ -156,8 +159,8 @@ export default function VeredictoCard({ analise: a }: { analise: Analise }) {
           )}
           <Linha label={`Realização (×${a.fator_realizacao})`} valor={`R$ ${brl(a.valor_revenda)}`} />
           <Linha
-            label={a.preco_pix ? 'Preço (Pix)' : 'Preço pedido'}
-            valor={`− R$ ${brl(a.preco_pix ?? a.preco_pedido)}`}
+            label="Preço pedido"
+            valor={`− R$ ${brl(a.preco_pedido ?? a.preco_pix)}`}
           />
           <Linha
             label={a.cidade ? `Combustível (${a.cidade.nome})` : 'Combustível'}
